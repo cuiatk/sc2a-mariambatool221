@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -30,6 +31,46 @@ public class ExtractTest {
         assert false; // make sure assertions are enabled with VM argument: -ea
     }
     
+public static Instant getStart(List<Tweet> tweets) {
+        
+        if (tweets.isEmpty()){
+            return Instant.now();
+        }
+        Instant startingtime = Instant.MAX;
+        for (Tweet tweet : tweets) {
+            if (tweet.getTimestamp().isBefore(startingtime)) {
+                startingtime = tweet.getTimestamp();
+            }
+        }
+        return startingtime;}
+    
+     public static Instant getEnding(List<Tweet> tweets) {
+    
+       if (tweets.isEmpty()){
+        return Instant.now();
+      }
+       Instant endingtime = Instant.MIN;
+      for (Tweet tweet : tweets) {
+        if (tweet.getTimestamp().isAfter(endingtime)) {
+            endingtime = tweet.getTimestamp();
+        }
+    }
+    return endingtime;
+}
+     
+
+     public static Timespan getTimespan(List<Tweet> tweets) {
+         if (tweets.isEmpty()) {
+             return new Timespan(Instant.now(), Instant.now());
+         } 
+         else {
+             Instant start = getStart(tweets);
+             Instant end = getEnding(tweets);
+             return new Timespan(start, end);
+
+         }
+
+     }
     @Test
     public void testGetTimespanTwoTweets() {
         Timespan timespan = Extract.getTimespan(Arrays.asList(tweet1, tweet2));
@@ -38,13 +79,17 @@ public class ExtractTest {
         assertEquals("expected end", d2, timespan.getEnd());
     }
     
+    
     @Test
     public void testGetMentionedUsersNoMention() {
         Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet1));
         
         assertTrue("expected empty set", mentionedUsers.isEmpty());
+        
+        
     }
 
+  
     /*
      * Warning: all the tests you write here must be runnable against any
      * Extract class that follows the spec. It will be run against several staff
