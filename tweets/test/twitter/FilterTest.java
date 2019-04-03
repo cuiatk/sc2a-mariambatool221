@@ -6,6 +6,7 @@ package twitter;
 import static org.junit.Assert.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class FilterTest {
     
     @Test(expected=AssertionError.class)
     public void testAssertionsEnabled() {
-        assert false; // make sure assertions are enabled with VM argument: -ea
+        assert false; // make sure assertions are enabled with VM argument: 
     }
     
     @Test
@@ -38,6 +39,21 @@ public class FilterTest {
         assertTrue("expected list to contain tweet", writtenBy.contains(tweet1));
     }
     
+    
+    @Test
+     public void testWrittenByEmptyTweets() {
+        List<Tweet> writtenBy = Filter.writtenBy(new ArrayList<Tweet>(), "rachit");
+        assertTrue(writtenBy.isEmpty());
+    } 
+    
+    
+    
+    @Test
+     public void testWrittenInDifferentCase(){
+         List<Tweet> writtenBy = Filter.writtenBy(Arrays.asList(tweet1), "ALYSSA");
+         assertTrue(writtenBy.contains(tweet1));
+    }
+    
     @Test
     public void testInTimespanMultipleTweetsMultipleResults() {
         Instant testStart = Instant.parse("2016-02-17T09:00:00Z");
@@ -45,7 +61,6 @@ public class FilterTest {
         
         List<Tweet> inTimespan = Filter.inTimespan(Arrays.asList(tweet1, tweet2), new Timespan(testStart, testEnd));
         
-        assertFalse("expected non-empty list", inTimespan.isEmpty());
         assertTrue("expected list to contain tweets", inTimespan.containsAll(Arrays.asList(tweet1, tweet2)));
         assertEquals("expected same order", 0, inTimespan.indexOf(tweet1));
     }
@@ -54,7 +69,6 @@ public class FilterTest {
     public void testContaining() {
         List<Tweet> containing = Filter.containing(Arrays.asList(tweet1, tweet2), Arrays.asList("talk"));
         
-        assertFalse("expected non-empty list", containing.isEmpty());
         assertTrue("expected list to contain tweets", containing.containsAll(Arrays.asList(tweet1, tweet2)));
         assertEquals("expected same order", 0, containing.indexOf(tweet1));
     }
